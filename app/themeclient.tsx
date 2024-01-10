@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Menu from "./components/menu";
 import { CssBaseline } from "@mui/material";
+import Footer from "./components/footer";
 
 export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
@@ -46,6 +47,7 @@ export default function ThemeClient({
       <CssBaseline />
       <Menu />
       {children}
+      <Footer />
     </ThemeProvider>
   );
 }
