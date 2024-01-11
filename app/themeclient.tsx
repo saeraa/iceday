@@ -4,6 +4,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Menu from "./components/menu";
 import { CssBaseline } from "@mui/material";
 import Footer from "./components/footer";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
@@ -43,11 +45,13 @@ export default function ThemeClient({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Menu />
-      {children}
-      <Footer />
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Menu />
+        {children}
+        <Footer />
+      </ThemeProvider>{" "}
+    </LocalizationProvider>
   );
 }
