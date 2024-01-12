@@ -15,11 +15,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
 import Link from "next/link";
+import { useContext } from "react";
+import { AuthContext } from "../context/Auth.context";
 
 const pages = ["Calendar", "Teams", "Leagues"];
-const settings = ["Login", "Register"];
+const loggedOutSettings = ["Login", "Register"];
+const loggedInSettings = ["Logout", "Account"];
 
-function ResponsiveAppBar() {
+export default function Page() {
+  const authContext = useContext(AuthContext);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -74,7 +78,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="menu app bar"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -154,9 +158,25 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <PersonIcon />
-              </IconButton>
+              {authContext.user?.email ? (
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: { xs: "none", sm: "none", md: "block" },
+                      mx: 2,
+                      borderBottom: 2,
+                    }}
+                  >
+                    Logged in as: {authContext.user.email}
+                  </Typography>
+                  <PersonIcon color="primary" />
+                </IconButton>
+              ) : (
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <PersonIcon color="inherit" />
+                </IconButton>
+              )}
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
@@ -174,11 +194,17 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Link href={setting.toLowerCase()}>{setting}</Link>
-                </MenuItem>
-              ))}
+              {authContext.user?.email
+                ? loggedInSettings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Link href={setting.toLowerCase()}>{setting}</Link>
+                    </MenuItem>
+                  ))
+                : loggedOutSettings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Link href={setting.toLowerCase()}>{setting}</Link>
+                    </MenuItem>
+                  ))}
             </Menu>
           </Box>
         </Toolbar>
@@ -186,4 +212,3 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
-export default ResponsiveAppBar;

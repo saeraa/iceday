@@ -6,6 +6,7 @@ import { CssBaseline } from "@mui/material";
 import Footer from "./components/footer";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AuthProvider } from "./context/Auth.context";
 
 export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
@@ -46,12 +47,14 @@ export default function ThemeClient({
 }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Menu />
-        {children}
-        <Footer />
-      </ThemeProvider>{" "}
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Menu />
+          {children}
+          <Footer />
+        </ThemeProvider>{" "}
+      </AuthProvider>
     </LocalizationProvider>
   );
 }
