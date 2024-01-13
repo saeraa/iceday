@@ -3,8 +3,6 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-//import { useAuth } from '../context/AuthUserContext';
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -15,9 +13,9 @@ import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import { Link } from "@mui/material";
 import { Copyright } from "@mui/icons-material";
-import { auth } from "@/firebase";
+import { createNewUser } from "@/utils/firebase-functions";
 
-export default function Page() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [passwordOne, setPasswordOne] = useState("");
   const [passwordTwo, setPasswordTwo] = useState("");
@@ -30,7 +28,7 @@ export default function Page() {
     //check if passwords match. If they do, create user in Firebase
     // and redirect to your logged in page.
     if (passwordOne === passwordTwo)
-      createUserWithEmailAndPassword(auth, email, passwordOne)
+      createNewUser(email, passwordOne)
         .then((authUser) => {
           console.log("Success. The user is created in Firebase");
           router.push("/");

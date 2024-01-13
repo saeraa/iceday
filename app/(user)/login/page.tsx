@@ -13,20 +13,23 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase";
+import { loginUser } from "@/utils/firebase-functions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Page() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
+  const loginAndRedirect = (email: string, password: string) => {
+    loginUser(email, password);
+    router.push("/");
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    signInWithEmailAndPassword(auth, email, password);
-    router.push("/");
+    loginAndRedirect(email, password);
   };
 
   return (

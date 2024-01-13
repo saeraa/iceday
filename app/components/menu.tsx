@@ -17,12 +17,15 @@ import PersonIcon from "@mui/icons-material/Person";
 import Link from "next/link";
 import { useContext } from "react";
 import { AuthContext } from "../context/Auth.context";
+import { logoutUser } from "@/utils/firebase-functions";
+import { useRouter } from "next/navigation";
 
 const pages = ["Calendar", "Teams", "Leagues"];
 const loggedOutSettings = ["Login", "Register"];
 const loggedInSettings = ["Logout", "Account"];
 
 export default function Page() {
+  const router = useRouter();
   const authContext = useContext(AuthContext);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -30,6 +33,11 @@ export default function Page() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+
+  const logoutAndRedirect = () => {
+    logoutUser();
+    router.push("/");
+  };
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -197,7 +205,13 @@ export default function Page() {
               {authContext.user?.email
                 ? loggedInSettings.map((setting) => (
                     <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                      <Link href={setting.toLowerCase()}>{setting}</Link>
+                      {setting == "Logout" ? (
+                        <Link href="/" onClick={logoutAndRedirect}>
+                          Logout
+                        </Link>
+                      ) : (
+                        <Link href={setting.toLowerCase()}>{setting}</Link>
+                      )}
                     </MenuItem>
                   ))
                 : loggedOutSettings.map((setting) => (
