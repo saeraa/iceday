@@ -2,16 +2,24 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import { signOut } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 
-const loginUser = function (email: string, password: string) {
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log("logging in... ");
-    })
-    .catch((error) => {
-      // TODO: something with errors
-      //console.error(error);
-    });
+const loginUser = async function (email: string, password: string) {
+  let message = "";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      if (error.code == "auth/wrong-password") {
+        return "Wrong password";
+      } else if (error.code == "auth/user-not-found") {
+        return "Email address not found";
+      }
+    }
+  }
+
+  return message;
 };
 
 const logoutUser = function () {
