@@ -102,12 +102,7 @@ export default function LoginPage() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (emailError.value == true || passwordError.value == true) {
-      console.log(emailError);
-      console.log(passwordError);
-      console.log("Form has errors. Please correct them.");
-    } else {
-      console.log("Form submitted successfully!");
+    if (!emailError.value && !passwordError.value) {
       loginAndRedirect(email, password);
     }
   };

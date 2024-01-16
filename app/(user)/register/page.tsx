@@ -41,8 +41,6 @@ export default function RegisterPage() {
         router.push("/");
       }
     } catch (error) {
-      console.error("Registration failed:", error);
-      // Handle other types of errors here if needed
     } finally {
       setLoading(false);
     }
@@ -102,10 +100,8 @@ export default function RegisterPage() {
     setFormError(defaultNoError);
 
     if (formError.value) {
-      console.log("Form has errors. Please correct them.");
       return;
     } else {
-      console.log("Form submitted successfully!");
       registerAndRedirect(email, passwordOne);
     }
   };

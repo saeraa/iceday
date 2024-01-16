@@ -24,7 +24,7 @@ const pages = ["Calendar", "Teams", "Leagues"];
 const loggedOutSettings = ["Login", "Register"];
 const loggedInSettings = ["Logout", "Account"];
 
-export default function Page() {
+export default function AppMenu() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
