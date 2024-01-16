@@ -1,4 +1,4 @@
-import { Box, Button, Container, Paper } from "@mui/material";
+import { Button, Container, Paper } from "@mui/material";
 import Link from "next/link";
 
 export default function NotFound() {

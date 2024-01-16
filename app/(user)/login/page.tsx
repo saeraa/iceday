@@ -11,57 +11,52 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { loginUser } from "@/utils/firebase-functions";
+import { loginUser, signInWithGoogle } from "@/utils/firebase-functions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert } from "@mui/material";
+import FormDialog from "./forgot-password";
+import PasswordInput from "@/app/components/password-input";
+
+const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+const defaultNoError = {
+  value: false,
+  message: "",
+};
 
 export default function LoginPage() {
-  const EMAIL_REGEX =
-    /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState({ value: false, message: "" });
-  const [passwordError, setPasswordError] = useState({
-    value: false,
-    message: "",
-  });
-  const [formError, setFormError] = useState({
-    value: false,
-    message: "",
-  });
-  const [formValues, setFormValues] = useState({
-    email: {
-      value: "",
-    },
-    password: {
-      value: "",
-    },
-  });
+  const [passwordError, setPasswordError] = useState(defaultNoError);
+  const [formError, setFormError] = useState(defaultNoError);
 
   React.useEffect(() => {
     validateForm();
-  }, [formValues.email, formValues.password]);
-
-  const handleChange = (
-    e: React.FormEvent<HTMLInputElement> & { target: HTMLInputElement }
-  ) => {
-    const { target } = e;
-    const { name, value } = target;
-    setFormValues({
-      ...formValues,
-      [name]: {
-        value,
-      },
-    });
-  };
+  }, [email, password]);
 
   const validateForm = () => {
-    if (!formValues.password.value) {
+    setPasswordError(defaultNoError);
+    setEmailError(defaultNoError);
+
+    if (!password) {
       setPasswordError({
         value: true,
         message: "Password is required",
       });
-    } else if (formValues.password.value.length < 6) {
+    } else if (password.length < 6) {
       setPasswordError({
         value: true,
         message: "Password must be at least 6 characters.",
@@ -73,12 +68,12 @@ export default function LoginPage() {
       });
     }
 
-    if (!formValues.email.value) {
+    if (!email) {
       setEmailError({
         value: true,
         message: "Email is required",
       });
-    } else if (!EMAIL_REGEX.test(formValues.email.value)) {
+    } else if (!EMAIL_REGEX.test(email)) {
       setEmailError({
         value: true,
         message: "Email format is invalid",
@@ -99,20 +94,21 @@ export default function LoginPage() {
         value: true,
         message: result,
       });
-    }
-
-    if (formError.value) {
+    } else if (!formError.value) {
       router.push("/");
     }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (emailError.value == true || passwordError.value == true) {
+      console.log(emailError);
+      console.log(passwordError);
       console.log("Form has errors. Please correct them.");
     } else {
       console.log("Form submitted successfully!");
-      loginAndRedirect(formValues.email.value, formValues.password.value);
+      loginAndRedirect(email, password);
     }
   };
 
@@ -143,24 +139,18 @@ export default function LoginPage() {
             name="email"
             autoComplete="email"
             autoFocus
-            value={formValues.email.value}
+            value={email}
             error={emailError.value && emailError.value}
             helperText={emailError.value && emailError.message}
-            onChange={handleChange}
+            onChange={(event) => setEmail(event.target.value)}
           />
-          <TextField
-            margin="normal"
+          <PasswordInput
             required
-            fullWidth
-            name="password"
             label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={formValues.password.value}
+            value={password}
             error={passwordError.value && passwordError.value}
-            helperText={passwordError.value && passwordError.message}
-            onChange={handleChange}
+            helperText={passwordError.message}
+            onChange={(value) => setPassword(value)}
           />
           {formError.value && (
             <Alert severity="error">{formError.message}</Alert>
@@ -175,7 +165,8 @@ export default function LoginPage() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <FormDialog open={open} handleClose={handleClose} />
+              <Link href="#" onClick={handleClickOpen} variant="body2">
                 Forgot password?
               </Link>
             </Grid>
@@ -184,6 +175,15 @@ export default function LoginPage() {
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
+            <Button
+              type="button"
+              onClick={signInWithGoogle}
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In With Google
+            </Button>
           </Grid>
         </Box>
       </Box>

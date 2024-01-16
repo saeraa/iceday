@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
@@ -8,38 +8,106 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
-import { Link } from "@mui/material";
-import { Copyright } from "@mui/icons-material";
+import { Alert, Link } from "@mui/material";
 import { createNewUser } from "@/utils/firebase-functions";
+import PasswordInput from "@/app/components/password-input";
+
+const defaultNoError = {
+  value: false,
+  message: "",
+};
+const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 export default function RegisterPage() {
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState(defaultNoError);
   const [email, setEmail] = useState("");
   const [passwordOne, setPasswordOne] = useState("");
   const [passwordTwo, setPasswordTwo] = useState("");
   const router = useRouter();
-  const [error, setError] = useState<String | null>(null);
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    console.log("submit");
-    setError(null);
-    //check if passwords match. If they do, create user in Firebase
-    // and redirect to your logged in page.
-    if (passwordOne === passwordTwo)
-      createNewUser(email, passwordOne)
-        .then((authUser) => {
-          console.log("Success. The user is created in Firebase");
-          router.push("/");
-        })
-        .catch((error) => {
-          console.log(error);
-          // An error occurred. Set error message to be displayed to user
-          setError(error.message);
+  const registerAndRedirect = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      const result = await createNewUser(email, password);
+
+      if (result && result.length > 0) {
+        setFormError({
+          value: true,
+          message: result,
         });
-    else setError("Password do not match");
+      } else if (formError.value === false) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+      // Handle other types of errors here if needed
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    validateForm();
+  }, [email, passwordOne, passwordTwo]);
+
+  const validateForm = () => {
+    setFormError(defaultNoError);
+
+    if (!passwordOne) {
+      setFormError({
+        value: true,
+        message: "Password is required",
+      });
+    } else if (passwordOne.length < 6) {
+      setFormError({
+        value: true,
+        message: "Password must be at least 6 characters.",
+      });
+    } else {
+      setFormError({
+        value: false,
+        message: "",
+      });
+    }
+
+    if (!email) {
+      setFormError({
+        value: true,
+        message: "Email is required",
+      });
+    } else if (!EMAIL_REGEX.test(email)) {
+      setFormError({
+        value: true,
+        message: "Email format is invalid",
+      });
+    } else {
+      setFormError({
+        value: false,
+        message: "",
+      });
+    }
+
+    if (passwordOne !== passwordTwo) {
+      setFormError({
+        value: true,
+        message: "Passwords do not match",
+      });
+    }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError(defaultNoError);
+
+    if (formError.value) {
+      console.log("Form has errors. Please correct them.");
+      return;
+    } else {
+      console.log("Form submitted successfully!");
+      registerAndRedirect(email, passwordOne);
+    }
   };
 
   return (
@@ -58,8 +126,8 @@ export default function RegisterPage() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
+        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Grid container spacing={2} marginBlock={2}>
             <Grid item xs={12}>
               <TextField
                 required
@@ -73,56 +141,48 @@ export default function RegisterPage() {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="passwordOne"
+              <PasswordInput
                 label="Password"
-                type="password"
-                autoComplete="new-password"
                 value={passwordOne}
-                onChange={(event) => setPasswordOne(event.target.value)}
-                id="signUpPassword"
+                onChange={(value) => setPasswordOne(value)}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
+              <PasswordInput
                 label="Password"
-                type="password"
-                autoComplete="new-password"
-                name="password"
                 value={passwordTwo}
-                onChange={(event) => setPasswordTwo(event.target.value)}
-                id="signUpPassword2"
+                onChange={(value) => setPasswordTwo(value)}
               />
             </Grid>
+            {/* // functionality to be added later
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
+                control={<Checkbox value="emailAlerts" color="primary" />}
+                label="Receive email alerts for games I favourite."
               />
-            </Grid>
+            </Grid> */}
           </Grid>
+          {formError.value && (
+            <Alert severity="error">{formError.message}</Alert>
+          )}
           <Button
+            disabled={formError.value && formError.value}
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
     </Container>
   );
 }
