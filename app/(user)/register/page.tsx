@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Alert, Link } from "@mui/material";
-import { createNewUser } from "@/utils/firebase-functions";
+import { createNewUser, signInWithGoogle } from "@/utils/firebase-functions";
 import PasswordInput from "@/app/components/password-input";
 
 const defaultNoError = {
@@ -176,6 +176,15 @@ export default function RegisterPage() {
                 Already have an account? Sign in
               </Link>
             </Grid>
+            <Button
+              type="button"
+              onClick={signInWithGoogle}
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign Up With Google
+            </Button>
           </Grid>
         </Box>
       </Box>
