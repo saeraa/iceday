@@ -9,7 +9,7 @@ import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Alert, Link } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel, Link } from "@mui/material";
 import { createNewUser, signInWithGoogle } from "@/utils/firebase-functions";
 import PasswordInput from "@/app/components/password-input";
 
@@ -25,12 +25,13 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [passwordOne, setPasswordOne] = useState("");
   const [passwordTwo, setPasswordTwo] = useState("");
+  const [emailAlerts, setEmailAlerts] = useState(false);
   const router = useRouter();
 
   const registerAndRedirect = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const result = await createNewUser(email, password);
+      const result = await createNewUser(email, password, emailAlerts);
 
       if (result && result.length > 0) {
         setFormError({
@@ -150,13 +151,19 @@ export default function RegisterPage() {
                 onChange={(value) => setPasswordTwo(value)}
               />
             </Grid>
-            {/* // functionality to be added later
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox value="emailAlerts" color="primary" />}
+                control={
+                  <Checkbox
+                    value="emailAlerts"
+                    color="primary"
+                    checked={emailAlerts}
+                    onChange={(e) => setEmailAlerts(e.target.checked)}
+                  />
+                }
                 label="Receive email alerts for games I favourite."
               />
-            </Grid> */}
+            </Grid>
           </Grid>
           {formError.value && (
             <Alert severity="error">{formError.message}</Alert>

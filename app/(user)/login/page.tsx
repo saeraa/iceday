@@ -86,6 +86,13 @@ export default function LoginPage() {
     }
   };
 
+  const loginWithGoogleAndRedirect = async () => {
+    const result = await signInWithGoogle();
+    if (result) {
+      router.push("/");
+    }
+  };
+
   const loginAndRedirect = async (email: string, password: string) => {
     const result = await loginUser(email, password);
 
@@ -172,7 +179,7 @@ export default function LoginPage() {
             </Grid>
             <Button
               type="button"
-              onClick={signInWithGoogle}
+              onClick={loginWithGoogleAndRedirect}
               fullWidth
               variant="outlined"
               sx={{ mt: 3, mb: 2 }}

@@ -2,7 +2,7 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "@/utils/firebase";
+import db, { auth } from "@/utils/firebase";
 import {
   signOut,
   signInWithEmailAndPassword,
@@ -10,23 +10,38 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
-const signInWithGoogle = () => {
+const signInWithGoogle = async (): Promise<boolean> => {
+  let response = false;
   const provider = new GoogleAuthProvider();
 
-  signInWithPopup(auth, provider)
+  await signInWithPopup(auth, provider)
     .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
       const credential = GoogleAuthProvider.credentialFromResult(result);
       if (credential != null) {
         const token = credential.accessToken;
       }
-      // The signed-in user info.
-      const user = result.user;
+      // The signed-in user.
+      const userId = result.user.uid;
+
+      // query database if user already exists
+      // if not exists, add to database
+      const docRef = doc(db, "users", userId);
+      getDoc(docRef).then((ref) => {
+        if (!ref.exists()) {
+          addNewUserToDatabase(userId, false);
+        }
+      });
+
+      response = true;
       // IdP data available using getAdditionalUserInfo(result)
       // ...
     })
     .catch((error) => {
+      console.error(error);
+      /* 
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -34,8 +49,11 @@ const signInWithGoogle = () => {
       const email = error.customData.email;
       // The AuthCredential type that was used.
       const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+      // ... */
+      response = false;
     });
+
+  return response;
 };
 
 const loginUser = async function (email: string, password: string) {
@@ -60,11 +78,75 @@ const logoutUser = function () {
   signOut(auth);
 };
 
-const createNewUser = async function (email: string, password: string) {
+const addNewUserToDatabase = async function (id: string, alerts: boolean) {
+  try {
+    const docRef = doc(db, "users", id);
+    await setDoc(
+      docRef,
+      {
+        emailAlerts: alerts,
+        roles: "user",
+      },
+      { merge: true }
+    );
+    console.log("Document written with ID: ", id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
+const getAlertPreferences = async function (userId: string): Promise<boolean> {
+  const docRef = doc(db, "users", userId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+    if (docSnap.data().emailAlerts) {
+      return docSnap.data().emailAlerts;
+    }
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+  return false;
+};
+
+const updateAlertPreferences = async function (
+  userId: string,
+  alerts: boolean
+): Promise<boolean> {
+  let result = false;
+  const userRef = doc(db, "users", userId);
+
+  await setDoc(
+    userRef,
+    {
+      emailAlerts: alerts,
+    },
+    { merge: true }
+  )
+    .then(() => {
+      result = true;
+    })
+    .catch((err) => {
+      result = false;
+    });
+
+  return result;
+};
+
+const createNewUser = async function (
+  email: string,
+  password: string,
+  alerts: boolean
+) {
   let message = "";
 
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const newUserId = result.user.uid;
+
+    addNewUserToDatabase(newUserId, alerts);
   } catch (error) {
     if (error instanceof FirebaseError) {
       if (error.code == "auth/email-already-in-use") {
@@ -96,4 +178,6 @@ export {
   loginUser,
   resetPassword,
   signInWithGoogle,
+  updateAlertPreferences,
+  getAlertPreferences,
 };
