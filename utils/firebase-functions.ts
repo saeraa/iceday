@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  EmailAuthProvider,
 } from "firebase/auth";
 import db, { auth } from "@/utils/firebase";
 import {
@@ -8,9 +9,54 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  deleteUser,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+
+const changeEmail = (email: string) => {
+  // do something
+};
+
+const deleteUserFromAuthAndDatabase = async (
+  password: string
+): Promise<string> => {
+  let message = "";
+  const currentUser = auth.currentUser;
+
+  if (currentUser && currentUser.email) {
+    const credential = EmailAuthProvider.credential(
+      currentUser.email,
+      password
+    );
+
+    await reauthenticateWithCredential(currentUser, credential)
+      .then(() => {
+        deleteUser(currentUser)
+          .then(() => {
+            // also delete from database
+          })
+          .catch((error) => {});
+      })
+      .catch((error) => {
+        if (error instanceof FirebaseError) {
+          if (error.code == "auth/wrong-password") {
+            message = "Wrong password";
+            return message;
+          } else if (error.code == "auth/user-not-found") {
+            message = "User not found";
+            return message;
+          }
+        }
+        // An error ocurred
+        // ...
+      });
+  } else {
+    // provide error or redirect to login page ?
+  }
+  return message;
+};
 
 const signInWithGoogle = async (): Promise<boolean> => {
   let response = false;
@@ -89,26 +135,34 @@ const addNewUserToDatabase = async function (id: string, alerts: boolean) {
       },
       { merge: true }
     );
-    console.log("Document written with ID: ", id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 };
 
-const getAlertPreferences = async function (userId: string): Promise<boolean> {
+interface AdditionalUserInfo {
+  emailAlerts: boolean | null;
+  isAdmin: boolean | null;
+}
+
+const getAdditionalUserInfo = async function (
+  userId: string
+): Promise<AdditionalUserInfo> {
+  const result = { emailAlerts: false, isAdmin: false };
   const docRef = doc(db, "users", userId);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    console.log("Document data:", docSnap.data());
     if (docSnap.data().emailAlerts) {
-      return docSnap.data().emailAlerts;
+      result.emailAlerts = docSnap.data().emailAlerts;
+      result.isAdmin = docSnap.data().roles == "admin" ? true : false;
+      return result;
     }
   } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
   }
-  return false;
+  return result;
 };
 
 const updateAlertPreferences = async function (
@@ -179,5 +233,6 @@ export {
   resetPassword,
   signInWithGoogle,
   updateAlertPreferences,
-  getAlertPreferences,
+  getAdditionalUserInfo,
+  deleteUserFromAuthAndDatabase,
 };

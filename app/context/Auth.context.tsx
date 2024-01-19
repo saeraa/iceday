@@ -2,7 +2,7 @@
 import React, { useEffect, useState, createContext, ReactNode } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/utils/firebase";
-import { getAlertPreferences } from "@/utils/firebase-functions";
+import { getAdditionalUserInfo } from "@/utils/firebase-functions";
 
 // undefined: onAuthStateChanged hasn't been called
 // null: user is not signed in
@@ -16,7 +16,7 @@ const refreshAuthenticationState = async () => {
   try {
     const currentUser = await auth.currentUser?.reload();
   } catch (error) {
-    console.error("Error refreshing authentication state:", error);
+    console.error("Error refreshing authentication state: ", error);
   }
 };
 
@@ -37,6 +37,7 @@ interface CustomUser {
   providerId: string;
   uid: string;
   emailAlerts: boolean;
+  isAdmin: boolean;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -45,16 +46,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("auth state changed");
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
-        const result = getAlertPreferences(uid).then((alertPreferences) => {
-          setUser({
-            ...user,
-            emailAlerts: alertPreferences,
-          });
+        const result = getAdditionalUserInfo(uid).then((userInfo) => {
+          if (userInfo.emailAlerts != null && userInfo.isAdmin != null) {
+            setUser({
+              ...user,
+              emailAlerts: userInfo.emailAlerts,
+              isAdmin: userInfo.isAdmin,
+            });
+          }
         });
         // ...
       } else {
