@@ -1,12 +1,14 @@
 "use client";
-import { Poppins } from "next/font/google";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Menu from "./components/menu";
+
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AuthProvider } from "./context/Auth.context";
 import { CssBaseline } from "@mui/material";
 import Footer from "./components/footer";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { AuthProvider } from "./context/Auth.context";
+import Menu from "./components/menu";
+import { Poppins } from "next/font/google";
 
 export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],

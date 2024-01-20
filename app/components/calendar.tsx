@@ -1,6 +1,5 @@
 "use client";
-import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
+
 import {
   DateCalendar,
   DayCalendarSkeleton,
@@ -8,6 +7,9 @@ import {
   PickersDayProps,
 } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
+
+import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
 import React from "react";
 
 // helper placeholder function to be removed when api call is implemented
