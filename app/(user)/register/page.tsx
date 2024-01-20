@@ -1,17 +1,19 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import Avatar from "@mui/material/Avatar";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+
 import { Alert, Checkbox, FormControlLabel, Link } from "@mui/material";
-import { createNewUser, signInWithGoogle } from "@/utils/firebase-functions";
+import { FormEvent, useEffect, useState } from "react";
+import { createNewUser, loginWithGoogle } from "@/utils/firebase-functions";
+
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PasswordInput from "@/app/components/password-input";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { useRouter } from "next/navigation";
 
 const defaultNoError = {
   value: false,
@@ -33,7 +35,7 @@ export default function RegisterPage() {
       setLoading(true);
       const result = await createNewUser(email, password, emailAlerts);
 
-      if (result && result.length > 0) {
+      if (result && result != "User created successfully") {
         setFormError({
           value: true,
           message: result,
@@ -65,10 +67,7 @@ export default function RegisterPage() {
         message: "Password must be at least 6 characters.",
       });
     } else {
-      setFormError({
-        value: false,
-        message: "",
-      });
+      setFormError(defaultNoError);
     }
 
     if (!email) {
@@ -82,10 +81,7 @@ export default function RegisterPage() {
         message: "Email format is invalid",
       });
     } else {
-      setFormError({
-        value: false,
-        message: "",
-      });
+      setFormError(defaultNoError);
     }
 
     if (passwordOne !== passwordTwo) {
@@ -185,7 +181,7 @@ export default function RegisterPage() {
             </Grid>
             <Button
               type="button"
-              onClick={signInWithGoogle}
+              onClick={loginWithGoogle}
               fullWidth
               variant="outlined"
               sx={{ mt: 3, mb: 2 }}

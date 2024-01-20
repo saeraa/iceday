@@ -1,7 +1,7 @@
+import Box from "@mui/material/Box";
 import Calendar from "./components/calendar";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 
 export default function Home() {
   return (

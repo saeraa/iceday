@@ -1,28 +1,30 @@
 "use client";
-import { FormEvent, useContext, useEffect, useState } from "react";
-import { AuthContext } from "@/app/context/Auth.context";
+
 import {
   Alert,
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
   FormControlLabel,
   Grid,
   Snackbar,
   TextField,
   Typography,
-  Divider,
-  DialogContent,
-  DialogContentText,
-  Dialog,
-  DialogActions,
-  DialogTitle,
 } from "@mui/material";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import {
+  changeUserEmail,
+  deleteAccount,
   updateAlertPreferences,
-  deleteUserFromAuthAndDatabase,
-  changeEmail,
 } from "@/utils/firebase-functions";
+
+import { AuthContext } from "@/app/context/Auth.context";
 
 export default function AccountPage() {
   const [wrongPassword, setWrongPassword] = useState(false);
@@ -41,12 +43,8 @@ export default function AccountPage() {
   const userId = user?.uid;
   const admin = user?.isAdmin;
 
-  const [emailAlerts, setEmailAlerts] = useState(
-    user?.emailAlerts !== undefined ? user.emailAlerts : false
-  );
-  const [userEmail, setUserEmail] = useState(
-    user?.email !== undefined && user?.email != null ? user.email : ""
-  );
+  const [emailAlerts, setEmailAlerts] = useState(user?.emailAlerts ?? false);
+  const [userEmail, setUserEmail] = useState(user?.email ?? "");
 
   useEffect(() => {
     if (user?.emailAlerts !== undefined) {
@@ -76,7 +74,7 @@ export default function AccountPage() {
     event.preventDefault();
     if (userId) {
       if (userEmail != null && userEmail != user?.email) {
-        await changeEmail(userEmail);
+        await changeUserEmail(userEmail);
       }
       if (emailAlerts != user?.emailAlerts) {
         await updateAlertPreferences(userId, emailAlerts);
@@ -91,13 +89,12 @@ export default function AccountPage() {
   ) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries((formData as any).entries());
-    const password = formJson.password;
-    const result = await deleteUserFromAuthAndDatabase(password);
+    const password = formData.get("password") as string;
+    const result = await deleteAccount(password);
     if (result == "Wrong password") {
       // mark field with wrong password, do not close
       setWrongPassword(true);
-    } else {
+    } else if (result == "Account deletion successful") {
       handleClose();
     }
   };

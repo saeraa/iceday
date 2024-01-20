@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import TextField from "@mui/material/TextField";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import TextField from "@mui/material/TextField";
 
 interface PasswordInputProps {
   label: string;

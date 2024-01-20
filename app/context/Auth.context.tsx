@@ -1,8 +1,10 @@
 "use client";
-import React, { useEffect, useState, createContext, ReactNode } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+
+import React, { ReactNode, createContext, useEffect, useState } from "react";
+
 import { auth } from "@/utils/firebase";
 import { getAdditionalUserInfo } from "@/utils/firebase-functions";
+import { onAuthStateChanged } from "firebase/auth";
 
 // undefined: onAuthStateChanged hasn't been called
 // null: user is not signed in

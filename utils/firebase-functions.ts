@@ -1,43 +1,52 @@
 import {
+  EmailAuthProvider,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-  EmailAuthProvider,
 } from "firebase/auth";
-import db, { auth } from "@/utils/firebase";
 import {
-  signOut,
-  signInWithEmailAndPassword,
-  signInWithPopup,
   GoogleAuthProvider,
   deleteUser,
   reauthenticateWithCredential,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
   updateEmail,
 } from "firebase/auth";
-import { FirebaseError } from "firebase/app";
-import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import db, { auth } from "@/utils/firebase";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 
-const changeEmail = async (email: string) => {
+import { FirebaseError } from "firebase/app";
+
+const handleFirebaseError = (error: FirebaseError | any) => {
+  console.error(error);
+  if (error instanceof FirebaseError) {
+    if (error.code === "auth/wrong-password") {
+      return "Wrong password";
+    } else if (error.code === "auth/user-not-found") {
+      return "User not found";
+    } else if (error.code === "auth/email-already-in-use") {
+      return "Email already registered, please sign in";
+    }
+  }
+  // handle other error codes if needed
+
+  return "An error occurred";
+};
+
+const changeUserEmail = async (email: string) => {
   const currentUser = auth.currentUser;
 
   if (currentUser && currentUser.email) {
-    await updateEmail(currentUser, email)
-      .then(() => {
-        return;
-        // Email updated!
-        // ...
-      })
-      .catch((error) => {
-        console.error(error);
-        // An error occurred
-        // ...
-      });
+    try {
+      await updateEmail(currentUser, email);
+      return;
+    } catch (error) {
+      return handleFirebaseError(error);
+    }
   }
 };
 
-const deleteUserFromAuthAndDatabase = async (
-  password: string
-): Promise<string> => {
-  let message = "";
+const deleteAccount = async (password: string): Promise<string> => {
   const currentUser = auth.currentUser;
 
   if (currentUser && currentUser.email) {
@@ -46,87 +55,57 @@ const deleteUserFromAuthAndDatabase = async (
       password
     );
 
-    await reauthenticateWithCredential(currentUser, credential)
-      .then(() => {
-        const docRef = doc(db, "users", currentUser.uid);
-        deleteDoc(docRef);
+    try {
+      await reauthenticateWithCredential(currentUser, credential);
 
-        deleteUser(currentUser)
-          .then(() => {
-            auth.signOut();
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-      .catch((error) => {
-        if (error instanceof FirebaseError) {
-          if (error.code == "auth/wrong-password") {
-            message = "Wrong password";
-            return message;
-          } else if (error.code == "auth/user-not-found") {
-            message = "User not found";
-            return message;
-          }
-        }
-        console.error(error);
-        // An error ocurred
-        // ...
-      });
+      const docRef = doc(db, "users", currentUser.uid);
+      await deleteDoc(docRef);
+
+      await deleteUser(currentUser);
+      auth.signOut();
+    } catch (error) {
+      return handleFirebaseError(error);
+    }
   } else {
     // provide error or redirect to login page ?
   }
-  return message;
+  return "Account deletion successful";
 };
 
-const signInWithGoogle = async (): Promise<boolean> => {
-  let response = false;
+const loginWithGoogle = async (): Promise<boolean> => {
   const provider = new GoogleAuthProvider();
 
-  await signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      if (credential != null) {
-        const token = credential.accessToken;
-      }
-      // The signed-in user.
-      const userId = result.user.uid;
-      // this function is for both creating user and signing in existing (google) users,
-      // so query database if user already exists
-      // if not exists, add to database
-      const docRef = doc(db, "users", userId);
-      getDoc(docRef).then((ref) => {
-        if (!ref.exists()) {
-          addNewUserToDatabase(userId, false);
-        }
-      });
-      response = true;
-    })
-    .catch((error) => {
-      console.error(error);
-      response = false;
-    });
+  try {
+    const result = await signInWithPopup(auth, provider);
 
-  return response;
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (credential != null) {
+      const token = credential.accessToken;
+    }
+
+    const userId = result.user.uid;
+    const docRef = doc(db, "users", userId);
+    const userDoc = await getDoc(docRef);
+
+    if (!userDoc.exists()) {
+      addNewUserToDatabase(userId, false);
+    }
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 const loginUser = async function (email: string, password: string) {
-  let message = "";
-
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    if (error instanceof FirebaseError) {
-      if (error.code == "auth/wrong-password") {
-        return "Wrong password";
-      } else if (error.code == "auth/user-not-found") {
-        return "Email address not found";
-      }
-    }
+    return handleFirebaseError(error);
   }
 
-  return message;
+  return "";
 };
 
 const logoutUser = function () {
@@ -178,24 +157,21 @@ const updateAlertPreferences = async function (
   userId: string,
   alerts: boolean
 ): Promise<boolean> {
-  let result = false;
   const userRef = doc(db, "users", userId);
 
-  await setDoc(
-    userRef,
-    {
-      emailAlerts: alerts,
-    },
-    { merge: true }
-  )
-    .then(() => {
-      result = true;
-    })
-    .catch((err) => {
-      result = false;
-    });
-
-  return result;
+  try {
+    await setDoc(
+      userRef,
+      {
+        emailAlerts: alerts,
+      },
+      { merge: true }
+    );
+    return true;
+  } catch (error) {
+    console.error("Error updating alert preferences: ", error);
+    return false;
+  }
 };
 
 const createNewUser = async function (
@@ -203,36 +179,25 @@ const createNewUser = async function (
   password: string,
   alerts: boolean
 ) {
-  let message = "";
-
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const newUserId = result.user.uid;
 
     addNewUserToDatabase(newUserId, alerts);
+    return "User created successfully";
   } catch (error) {
-    if (error instanceof FirebaseError) {
-      if (error.code == "auth/email-already-in-use") {
-        return "Email already registered, please sign in";
-      }
-    }
+    return handleFirebaseError(error);
   }
-
-  return message;
 };
 
 const resetPassword = async function (email: string) {
-  let message = "";
-
   try {
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
-    if (error instanceof FirebaseError) {
-      return error.code;
-    }
+    return handleFirebaseError(error);
   }
 
-  return message;
+  return "Password reset email sent successfully";
 };
 
 export {
@@ -240,9 +205,9 @@ export {
   logoutUser,
   loginUser,
   resetPassword,
-  signInWithGoogle,
+  loginWithGoogle,
   updateAlertPreferences,
   getAdditionalUserInfo,
-  deleteUserFromAuthAndDatabase,
-  changeEmail,
+  deleteAccount,
+  changeUserEmail,
 };

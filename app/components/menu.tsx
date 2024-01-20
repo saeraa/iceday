@@ -1,22 +1,24 @@
 "use client";
 
 import * as React from "react";
+
+import { useContext, useEffect, useState } from "react";
+
 import AppBar from "@mui/material/AppBar";
+import { AuthContext } from "../context/Auth.context";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
+import Image from "next/image";
+import Link from "next/link";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/Auth.context";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 import { logoutUser } from "@/utils/firebase-functions";
 import { useRouter } from "next/navigation";
 

@@ -1,22 +1,24 @@
 "use client";
 
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { loginUser, signInWithGoogle } from "@/utils/firebase-functions";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
+import { loginUser, loginWithGoogle } from "@/utils/firebase-functions";
+
 import { Alert } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import CssBaseline from "@mui/material/CssBaseline";
 import FormDialog from "./forgot-password";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PasswordInput from "@/app/components/password-input";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
@@ -87,7 +89,7 @@ export default function LoginPage() {
   };
 
   const loginWithGoogleAndRedirect = async () => {
-    const result = await signInWithGoogle();
+    const result = await loginWithGoogle();
     if (result) {
       router.push("/");
     }
