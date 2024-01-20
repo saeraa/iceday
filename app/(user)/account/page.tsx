@@ -21,6 +21,7 @@ import {
 import {
   updateAlertPreferences,
   deleteUserFromAuthAndDatabase,
+  changeEmail,
 } from "@/utils/firebase-functions";
 
 export default function AccountPage() {
@@ -44,7 +45,7 @@ export default function AccountPage() {
     user?.emailAlerts !== undefined ? user.emailAlerts : false
   );
   const [userEmail, setUserEmail] = useState(
-    user?.email !== undefined ? user.email : ""
+    user?.email !== undefined && user?.email != null ? user.email : ""
   );
 
   useEffect(() => {
@@ -52,6 +53,12 @@ export default function AccountPage() {
       setEmailAlerts(user.emailAlerts);
     }
   }, [user?.emailAlerts]);
+
+  useEffect(() => {
+    if (user?.email !== undefined && user?.email != null) {
+      setUserEmail(user.email);
+    }
+  }, [user?.email]);
 
   useEffect(() => {
     if (showAlert) {
@@ -68,11 +75,13 @@ export default function AccountPage() {
   const handleSubmit = async function (event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (userId) {
-      if (userEmail != user?.email) {
-        // update user email
+      if (userEmail != null && userEmail != user?.email) {
+        await changeEmail(userEmail);
       }
-      const result = await updateAlertPreferences(userId, emailAlerts);
-      refreshAuthenticationState();
+      if (emailAlerts != user?.emailAlerts) {
+        await updateAlertPreferences(userId, emailAlerts);
+      }
+      await refreshAuthenticationState();
       setShowAlert(true);
     }
   };
@@ -207,7 +216,7 @@ export default function AccountPage() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          Email preferences updated!
+          Account settings saved!
         </Alert>
       </Snackbar>
 

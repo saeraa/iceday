@@ -11,12 +11,27 @@ import {
   GoogleAuthProvider,
   deleteUser,
   reauthenticateWithCredential,
+  updateEmail,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
-const changeEmail = (email: string) => {
-  // do something
+const changeEmail = async (email: string) => {
+  const currentUser = auth.currentUser;
+
+  if (currentUser && currentUser.email) {
+    await updateEmail(currentUser, email)
+      .then(() => {
+        return;
+        // Email updated!
+        // ...
+      })
+      .catch((error) => {
+        console.error(error);
+        // An error occurred
+        // ...
+      });
+  }
 };
 
 const deleteUserFromAuthAndDatabase = async (
@@ -33,11 +48,16 @@ const deleteUserFromAuthAndDatabase = async (
 
     await reauthenticateWithCredential(currentUser, credential)
       .then(() => {
+        const docRef = doc(db, "users", currentUser.uid);
+        deleteDoc(docRef);
+
         deleteUser(currentUser)
           .then(() => {
-            // also delete from database
+            auth.signOut();
           })
-          .catch((error) => {});
+          .catch((error) => {
+            console.error(error);
+          });
       })
       .catch((error) => {
         if (error instanceof FirebaseError) {
@@ -49,6 +69,7 @@ const deleteUserFromAuthAndDatabase = async (
             return message;
           }
         }
+        console.error(error);
         // An error ocurred
         // ...
       });
@@ -71,8 +92,8 @@ const signInWithGoogle = async (): Promise<boolean> => {
       }
       // The signed-in user.
       const userId = result.user.uid;
-
-      // query database if user already exists
+      // this function is for both creating user and signing in existing (google) users,
+      // so query database if user already exists
       // if not exists, add to database
       const docRef = doc(db, "users", userId);
       getDoc(docRef).then((ref) => {
@@ -80,22 +101,10 @@ const signInWithGoogle = async (): Promise<boolean> => {
           addNewUserToDatabase(userId, false);
         }
       });
-
       response = true;
-      // IdP data available using getAdditionalUserInfo(result)
-      // ...
     })
     .catch((error) => {
       console.error(error);
-      /* 
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ... */
       response = false;
     });
 
@@ -235,4 +244,5 @@ export {
   updateAlertPreferences,
   getAdditionalUserInfo,
   deleteUserFromAuthAndDatabase,
+  changeEmail,
 };

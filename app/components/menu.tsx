@@ -15,7 +15,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/Auth.context";
 import { logoutUser } from "@/utils/firebase-functions";
 import { useRouter } from "next/navigation";
@@ -27,12 +27,20 @@ const loggedInSettings = ["Logout", "Account"];
 export default function AppMenu() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const user = authContext.user;
+
+  const [userEmail, setUserEmail] = useState(
+    user?.email !== undefined && user?.email != null ? user.email : ""
   );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+
+  useEffect(() => {
+    if (user?.email !== undefined && user?.email != null) {
+      setUserEmail(user.email);
+    }
+  }, [user?.email, user]);
 
   const logoutAndRedirect = () => {
     logoutUser();
@@ -166,7 +174,7 @@ export default function AppMenu() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              {authContext.user?.email ? (
+              {userEmail ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Typography
                     variant="caption"
@@ -176,7 +184,7 @@ export default function AppMenu() {
                       borderBottom: 2,
                     }}
                   >
-                    Logged in as: {authContext.user.email}
+                    Logged in as: {userEmail}
                   </Typography>
                   <PersonIcon color="primary" />
                 </IconButton>

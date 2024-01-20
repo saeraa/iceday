@@ -94,6 +94,7 @@ export default function LoginPage() {
   };
 
   const loginAndRedirect = async (email: string, password: string) => {
+    setFormError(defaultNoError);
     const result = await loginUser(email, password);
 
     if (result && result.length > 0) {

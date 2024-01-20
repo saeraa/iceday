@@ -13,8 +13,9 @@ interface ContextProps {
 }
 
 const refreshAuthenticationState = async () => {
+  console.log("refreshAuthenticationState");
   try {
-    const currentUser = await auth.currentUser?.reload();
+    await auth.currentUser?.reload();
   } catch (error) {
     console.error("Error refreshing authentication state: ", error);
   }
