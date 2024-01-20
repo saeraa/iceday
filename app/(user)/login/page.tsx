@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { loginUser, loginWithGoogle } from "@/utils/firebase-functions";
+import { loginUser, loginWithGoogle } from "@/utils/firebase-account";
 
 import { Alert } from "@mui/material";
 import Avatar from "@mui/material/Avatar";

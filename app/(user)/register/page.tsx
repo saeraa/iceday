@@ -2,7 +2,7 @@
 
 import { Alert, Checkbox, FormControlLabel, Link } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
-import { createNewUser, loginWithGoogle } from "@/utils/firebase-functions";
+import { createNewUser, loginWithGoogle } from "@/utils/firebase-account";
 
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";

@@ -3,7 +3,7 @@
 import React, { ReactNode, createContext, useEffect, useState } from "react";
 
 import { auth } from "@/utils/firebase";
-import { getAdditionalUserInfo } from "@/utils/firebase-functions";
+import { getAdditionalUserInfo } from "@/utils/firebase-account";
 import { onAuthStateChanged } from "firebase/auth";
 
 // undefined: onAuthStateChanged hasn't been called

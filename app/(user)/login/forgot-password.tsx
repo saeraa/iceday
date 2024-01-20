@@ -10,7 +10,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import { resetPassword } from "@/utils/firebase-functions";
+import { resetPassword } from "@/utils/firebase-account";
 import { useState } from "react";
 
 const defaultNoError = {
