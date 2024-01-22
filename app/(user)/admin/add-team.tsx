@@ -18,14 +18,9 @@ export default function AddTeamForm() {
 
   return (
     <Box component="form" noValidate action={formAction} sx={{ mt: 1 }}>
-      <TextFieldInput
-        label="Name"
-        value="Rögle BK"
-        autoFocus={true}
-        required={true}
-      />
-      <TextFieldInput label="Abbreviation" value="RBK" required={true} />
-      <TextFieldInput label="City" value="Ängelholm" required={true} />
+      <TextFieldInput label="Name" value="Rögle BK" autoFocus={true} />
+      <TextFieldInput label="Abbreviation" value="RBK" />
+      <TextFieldInput label="City" value="Ängelholm" />
 
       <SelectLeague />
 
