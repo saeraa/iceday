@@ -17,7 +17,7 @@ export default function AddTeamForm() {
   const [state, formAction] = useFormState(upload, initialState);
 
   return (
-    <Box component="form" action={formAction} sx={{ mt: 1 }}>
+    <Box component="form" noValidate action={formAction} sx={{ mt: 1 }}>
       <TextFieldInput
         label="Name"
         value="Rögle BK"
