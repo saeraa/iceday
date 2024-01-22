@@ -1,5 +1,7 @@
-import db, { auth } from "@/utils/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
+
+import db from "@/utils/firebase";
 
 const storage = getStorage();
 
@@ -10,8 +12,8 @@ interface TeamData {
   icon: File | null;
 }
 
-const uploadTeamIcon = async (file: File) => {
-  const storageRef = ref(storage, "teams");
+const uploadTeamIcon = async (file: File, abbreviation: string) => {
+  const storageRef = ref(storage, `teams/${abbreviation}`);
 
   // 'file' comes from the Blob or File API
   const result = await uploadBytes(storageRef, file);
@@ -20,12 +22,20 @@ const uploadTeamIcon = async (file: File) => {
   return path;
 };
 
-const addTeam = (teamData: TeamData) => {
+const addTeam = async (teamData: TeamData) => {
+  let url = "";
   if (teamData.icon != null) {
-    uploadTeamIcon(teamData.icon);
+    url = await uploadTeamIcon(teamData.icon, teamData.abbreviation);
   }
 
-  // then add team data to the db
+  const result = await setDoc(doc(db, "teams", teamData.abbreviation), {
+    name: teamData.name,
+    abbreviation: teamData.abbreviation,
+    city: teamData.city,
+    icon: url,
+  });
+
+  return result;
 };
 
 export { uploadTeamIcon, addTeam };

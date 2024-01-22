@@ -1,57 +1,60 @@
 "use server";
 
-import { join } from "path";
+import { AlertColor } from "@mui/material";
+import { addTeam } from "@/utils/firebase-database";
 
 interface FormDataToUpload {
   name: string;
   abbreviation: string;
   city: string;
-  file?: File | null;
+  icon: File | null;
 }
 
-export default async function upload(data: FormData) {
+export default async function upload(
+  prevState: {
+    message: string;
+    status: AlertColor;
+  },
+  formData: FormData
+): Promise<{ message: string; status: AlertColor }> {
   "use server";
 
-  console.log(data);
+  console.log("add team form submitted");
+  console.log(formData);
 
   // check if file
-  const file: File | null = data.get("file") as unknown as File;
-  if (file) {
-    // -- upload file
-    // -- get file reference
+  const file: File | null = formData.get("file") as unknown as File;
+  const name = formData.get("name")?.toString();
+  const abbreviation = formData.get("abbreviation")?.toString();
+  const city = formData.get("city")?.toString();
 
-    // add rest of form data
-    // return message success or error
-    const name = data.get("name")?.toString();
-    const abbreviation = data.get("abbreviation")?.toString();
-    const city = data.get("city")?.toString();
-
-    if (name && abbreviation && city) {
-      const formData: FormDataToUpload = {
-        name: name,
-        abbreviation: abbreviation,
-        city: city,
-        file: null,
-      };
+  if (name && abbreviation && city) {
+    if (name.length == 0 || abbreviation.length == 0 || city.length == 0) {
+      return { message: "Missing some entries", status: "error" };
     } else {
-      return;
+      if (!file) {
+        const formData: FormDataToUpload = {
+          name: name,
+          abbreviation: abbreviation,
+          city: city,
+          icon: null,
+        };
+        addTeam(formData);
+        return {
+          message: "Success!",
+          status: "success",
+        };
+      } else {
+        const formData: FormDataToUpload = {
+          name: name,
+          abbreviation: abbreviation,
+          city: city,
+          icon: file,
+        };
+        addTeam(formData);
+        return { message: "Success!", status: "success" };
+      }
     }
   }
-
-  // add rest of form data
-  // return message success or error
-
-  /*   
-    
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // With the file data in the buffer, you can do whatever you want with it.
-  // For this, we'll just write it to the filesystem in a new location
-  const path = join("/", "tmp", file.name);
-  // await writeFile(path, buffer);
-  console.log(`open ${path} to see the uploaded file`);
- */
-  return { success: true };
+  return { message: "Something went wrong", status: "error" };
 }
