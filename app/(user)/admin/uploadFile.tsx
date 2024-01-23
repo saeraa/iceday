@@ -2,6 +2,7 @@
 
 import { AlertColor } from "@mui/material";
 import { addTeam } from "@/utils/firebase-database";
+import { isCurrentUserAdmin } from "@/utils/firebase-account";
 import { validateTeam } from "@/utils/validation";
 
 interface FormDataToUpload {
@@ -32,13 +33,21 @@ export default async function upload(
 }> {
   "use server";
 
+  const isAdmin = await isCurrentUserAdmin();
+  if (!isAdmin) {
+    return {
+      message: "Only admins can add data to the database",
+      status: "error",
+      errors: null,
+    };
+  }
+
   // check if file
   const file: File | null = formData.get("file") as unknown as File;
   const name = formData.get("name")?.toString();
   const abbreviation = formData.get("abbreviation")?.toString();
   const league = formData.get("league")?.toString();
   const city = formData.get("city")?.toString();
-  console.log(file);
 
   const formDataToValidate = {
     name,
@@ -49,7 +58,6 @@ export default async function upload(
   };
 
   const validationResult = validateTeam(formDataToValidate);
-  console.log(validationResult);
 
   const keys = Object.keys(validationResult) as Array<
     keyof typeof validationResult

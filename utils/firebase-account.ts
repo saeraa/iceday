@@ -1,3 +1,5 @@
+"use server";
+
 import {
   EmailAuthProvider,
   createUserWithEmailAndPassword,
@@ -133,6 +135,21 @@ interface AdditionalUserInfo {
   isAdmin: boolean | null;
 }
 
+const isCurrentUserAdmin = async function (): Promise<boolean> {
+  const userId = auth.currentUser?.uid;
+  if (userId) {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if (docSnap.data().emailAlerts) {
+        return docSnap.data().roles == "admin" ? true : false;
+      }
+    }
+    return false;
+  }
+  return false;
+};
+
 const getAdditionalUserInfo = async function (
   userId: string
 ): Promise<AdditionalUserInfo> {
@@ -210,4 +227,5 @@ export {
   getAdditionalUserInfo,
   deleteAccount,
   changeUserEmail,
+  isCurrentUserAdmin,
 };
