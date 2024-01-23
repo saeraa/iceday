@@ -1,4 +1,10 @@
-import { InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 
 import { useState } from "react";
 
@@ -11,20 +17,22 @@ export default function SelectLeague() {
 
   return (
     <>
-      <InputLabel id="league-label">League</InputLabel>
-      <Select
-        name="league"
-        fullWidth
-        labelId="league-label"
-        id="league"
-        label="League"
-        onChange={handleChange}
-        value={league}
-      >
-        <MenuItem value={"League 1"}>League 1</MenuItem>
-        <MenuItem value={"League 2"}>League 2</MenuItem>
-        <MenuItem value={"League 3"}>League 3</MenuItem>
-      </Select>
+      <FormControl sx={{ my: 2, minWidth: "100%" }}>
+        <InputLabel id="league-label">League</InputLabel>
+        <Select
+          name="league"
+          fullWidth
+          labelId="league-label"
+          id="league"
+          label="League"
+          onChange={handleChange}
+          value={league}
+        >
+          <MenuItem value={"League 1"}>League 1</MenuItem>
+          <MenuItem value={"League 2"}>League 2</MenuItem>
+          <MenuItem value={"League 3"}>League 3</MenuItem>
+        </Select>
+      </FormControl>
     </>
   );
 }

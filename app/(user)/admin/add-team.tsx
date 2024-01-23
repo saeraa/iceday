@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Input, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField } from "@mui/material";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { AlertColor } from "@mui/material";
@@ -25,7 +25,7 @@ export default function AddTeamForm() {
     <Box component="form" noValidate action={formAction} sx={{ mt: 1 }}>
       <TextFieldInput
         label="Name"
-        value="Rögle BK"
+        value=""
         autoFocus={true}
         error={state.errors?.name.success == "false" && true}
         helperText={
@@ -34,7 +34,7 @@ export default function AddTeamForm() {
       />
       <TextFieldInput
         label="Abbreviation"
-        value="RBK"
+        value=""
         error={state.errors?.abbreviation.success == "false" && true}
         helperText={
           state.errors?.abbreviation.success == "false"
@@ -44,12 +44,13 @@ export default function AddTeamForm() {
       />
       <TextFieldInput
         label="City"
-        value="Ängelholm"
+        value=""
         error={state.errors?.city.success == "false" && true}
         helperText={
           state.errors?.city.success == "false" ? state.errors.city.error : ""
         }
       />
+
       <SelectLeague />
       <TextField
         type="file"
