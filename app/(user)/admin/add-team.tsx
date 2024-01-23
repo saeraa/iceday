@@ -1,8 +1,7 @@
-import { Alert, Box, Button } from "@mui/material";
+import { Alert, Box, Button, Input, TextField } from "@mui/material";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { AlertColor } from "@mui/material";
-import PublishIcon from "@mui/icons-material/Publish";
 import SelectLeague from "./select-league";
 import TextFieldInput from "@/app/components/textfield-input";
 import upload from "./uploadFile";
@@ -10,6 +9,12 @@ import upload from "./uploadFile";
 const initialState = {
   message: "",
   status: "success" as AlertColor,
+  errors: {
+    name: { success: "true", error: "" },
+    abbreviation: { success: "true", error: "" },
+    city: { success: "true", error: "" },
+    file: { success: "true", error: "" },
+  },
 };
 
 export default function AddTeamForm() {
@@ -18,31 +23,48 @@ export default function AddTeamForm() {
 
   return (
     <Box component="form" noValidate action={formAction} sx={{ mt: 1 }}>
-      <TextFieldInput label="Name" value="Rögle BK" autoFocus={true} />
-      <TextFieldInput label="Abbreviation" value="RBK" />
-      <TextFieldInput label="City" value="Ängelholm" />
-
-      <SelectLeague />
-
-      <input
-        style={{ display: "none" }}
-        accept="image/*"
-        id="uploadFile"
-        type="file"
-        name="file"
+      <TextFieldInput
+        label="Name"
+        value="Rögle BK"
+        autoFocus={true}
+        error={state.errors?.name.success == "false" && true}
+        helperText={
+          state.errors?.name.success == "false" ? state.errors.name.error : ""
+        }
       />
-      <label htmlFor="uploadFile">
-        <Button
-          component="span"
-          startIcon={<PublishIcon />}
-          sx={{ my: 2 }}
-          variant="outlined"
-          color="secondary"
-        >
-          Upload team icon
-        </Button>
-      </label>
-
+      <TextFieldInput
+        label="Abbreviation"
+        value="RBK"
+        error={state.errors?.abbreviation.success == "false" && true}
+        helperText={
+          state.errors?.abbreviation.success == "false"
+            ? state.errors.abbreviation.error
+            : ""
+        }
+      />
+      <TextFieldInput
+        label="City"
+        value="Ängelholm"
+        error={state.errors?.city.success == "false" && true}
+        helperText={
+          state.errors?.city.success == "false" ? state.errors.city.error : ""
+        }
+      />
+      <SelectLeague />
+      <TextField
+        type="file"
+        InputLabelProps={{ shrink: true }}
+        margin="normal"
+        required
+        fullWidth
+        id="uploadFile"
+        name="file"
+        label="Team icon"
+        error={state.errors?.file.success == "false" && true}
+        helperText={
+          state.errors?.file.success == "false" ? state.errors.file.error : ""
+        }
+      />
       <Button
         type="submit"
         fullWidth

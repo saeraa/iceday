@@ -1,9 +1,6 @@
+import db, { storage } from "@/utils/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-
-import db from "@/utils/firebase";
-
-const storage = getStorage();
+import { ref, uploadBytes } from "firebase/storage";
 
 interface TeamData {
   name: string;
