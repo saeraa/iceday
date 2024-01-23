@@ -6,7 +6,7 @@ interface TeamData {
   name: string;
   abbreviation: string;
   city: string;
-  icon: File | null;
+  file: File | null;
 }
 
 const uploadTeamIcon = async (file: File, abbreviation: string) => {
@@ -21,8 +21,8 @@ const uploadTeamIcon = async (file: File, abbreviation: string) => {
 
 const addTeam = async (teamData: TeamData) => {
   let url = "";
-  if (teamData.icon != null) {
-    url = await uploadTeamIcon(teamData.icon, teamData.abbreviation);
+  if (teamData.file != null) {
+    url = await uploadTeamIcon(teamData.file, teamData.abbreviation);
   }
 
   const result = await setDoc(doc(db, "teams", teamData.abbreviation), {

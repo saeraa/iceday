@@ -22,6 +22,7 @@ const name = z
     invalid_type_error: "Name must be a string",
   })
   .trim()
+  .min(2, { message: "Name is required" })
   .max(100, { message: "Name must not be longer than 100 characters." });
 
 const abbreviation = z
@@ -30,6 +31,7 @@ const abbreviation = z
     invalid_type_error: "Abbreviation must be a string",
   })
   .trim()
+  .min(2, { message: "Abbreviation is required" })
   .max(5, { message: "Abbreviations must not be longer than 5 letters." });
 
 const teamIcon = z
@@ -41,7 +43,7 @@ const teamIcon = z
     ".jpg, .jpeg, .png and .webp files are accepted."
   );
 
-const city = z.string().trim();
+const city = z.string().trim().min(2, { message: "City is required" });
 
 const passwordForm = z
   .object({
@@ -68,7 +70,7 @@ interface TeamObject {
   abbreviation: string | undefined;
   league: string | undefined;
   city: string | undefined;
-  file: File;
+  file: File | null;
 }
 
 function validateTeam(input: TeamObject): TeamErrorObject {
@@ -80,25 +82,50 @@ function validateTeam(input: TeamObject): TeamErrorObject {
   };
 }
 
-function validateLogin(input: any) {
+interface LoginErrorObject {
+  email: { success: string; error: string };
+  password: { success: string; error: string };
+}
+
+interface LoginObject {
+  email: string | undefined;
+  password: string | undefined;
+}
+
+function validateLogin(input: LoginObject): LoginErrorObject {
   return {
     email: parseInput(input.email, email),
     password: parseInput(input.password, password),
   };
 }
 
-function validateRegister(input: any) {
+interface RegisterErrorObject {
+  email: { success: string; error: string };
+  passwordOne: { success: string; error: string };
+  passwordTwo: { success: string; error: string };
+}
+
+interface RegisterObject {
+  email: string | undefined;
+  passwordOne: string | undefined;
+  passwordTwo: string | undefined;
+}
+
+function validateRegister(input: RegisterObject): RegisterErrorObject {
   return {
     email: parseInput(input.email, email),
-    passwordOne: parseInput(input.password, password),
+    passwordOne: parseInput(input.passwordOne, password),
     passwordTwo: parseInput(input.passwordOne, passwordForm, input.passwordTwo),
   };
 }
 
-function parseInput(input: any, schema: ZodSchema, ...args: undefined[]) {
+function parseInput(input: any, schema: ZodSchema, secondInput?: string) {
   let validationResult: z.SafeParseReturnType<any, any>;
-  if (args) {
-    validationResult = schema.safeParse(input, args[0]);
+  if (secondInput) {
+    validationResult = schema.safeParse({
+      password: input,
+      confirm: secondInput,
+    });
   } else {
     validationResult = schema.safeParse(input);
   }

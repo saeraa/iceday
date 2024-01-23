@@ -1,5 +1,3 @@
-"use server";
-
 import {
   EmailAuthProvider,
   createUserWithEmailAndPassword,
@@ -14,7 +12,7 @@ import {
   signOut,
   updateEmail,
 } from "firebase/auth";
-import db, { auth } from "@/utils/firebase";
+import db, { auth, googleProvider } from "@/utils/firebase";
 import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 
 import { FirebaseError } from "firebase/app";
@@ -33,6 +31,20 @@ const handleFirebaseError = (error: FirebaseError | any) => {
   // handle other error codes if needed
 
   return "An error occurred";
+};
+
+const isCurrentUserAdmin = async function (): Promise<boolean> {
+  const userId = auth.currentUser?.uid;
+
+  if (userId) {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data().roles == "admin" ? true : false;
+    }
+    return false;
+  }
+  return false;
 };
 
 const changeUserEmail = async (email: string) => {
@@ -75,10 +87,8 @@ const deleteAccount = async (password: string): Promise<string> => {
 };
 
 const loginWithGoogle = async (): Promise<boolean> => {
-  const provider = new GoogleAuthProvider();
-
   try {
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, googleProvider);
 
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (credential != null) {
@@ -134,21 +144,6 @@ interface AdditionalUserInfo {
   emailAlerts: boolean | null;
   isAdmin: boolean | null;
 }
-
-const isCurrentUserAdmin = async function (): Promise<boolean> {
-  const userId = auth.currentUser?.uid;
-  if (userId) {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      if (docSnap.data().emailAlerts) {
-        return docSnap.data().roles == "admin" ? true : false;
-      }
-    }
-    return false;
-  }
-  return false;
-};
 
 const getAdditionalUserInfo = async function (
   userId: string

@@ -1,5 +1,3 @@
-"use server";
-
 import { AlertColor } from "@mui/material";
 import { addTeam } from "@/utils/firebase-database";
 import { isCurrentUserAdmin } from "@/utils/firebase-account";
@@ -9,7 +7,8 @@ interface FormDataToUpload {
   name: string;
   abbreviation: string;
   city: string;
-  icon: File | null;
+  league: string;
+  file: File | null;
 }
 
 interface ErrorObject {
@@ -31,8 +30,6 @@ export default async function upload(
   status: AlertColor;
   errors: ErrorObject | null;
 }> {
-  "use server";
-
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) {
     return {
@@ -49,12 +46,12 @@ export default async function upload(
   const league = formData.get("league")?.toString();
   const city = formData.get("city")?.toString();
 
-  const formDataToValidate = {
-    name,
-    abbreviation,
-    league,
-    city,
-    file,
+  const formDataToValidate: FormDataToUpload = {
+    name: name ?? "",
+    abbreviation: abbreviation ?? "",
+    league: league ?? "",
+    city: city ?? "",
+    file: file.size === 0 ? null : file,
   };
 
   const validationResult = validateTeam(formDataToValidate);
@@ -74,13 +71,14 @@ export default async function upload(
   if (error) {
     return { message: "", status: "error", errors: validationResult };
   } else {
-    if (name && abbreviation && city) {
+    if (name && abbreviation && city && league) {
       if (!file) {
         const formData: FormDataToUpload = {
           name: name,
           abbreviation: abbreviation,
           city: city,
-          icon: null,
+          league: league,
+          file: null,
         };
         addTeam(formData);
         return {
@@ -93,7 +91,8 @@ export default async function upload(
           name: name,
           abbreviation: abbreviation,
           city: city,
-          icon: file,
+          league: league,
+          file: file,
         };
         addTeam(formData);
         return {

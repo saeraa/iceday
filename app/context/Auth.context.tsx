@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
         const result = getAdditionalUserInfo(uid).then((userInfo) => {
+          console.log("userinfo: ", userInfo);
           if (userInfo.emailAlerts != null && userInfo.isAdmin != null) {
             setUser({
               ...user,
