@@ -1,107 +1,44 @@
 "use client";
 
-import { Alert, Checkbox, FormControlLabel, Link } from "@mui/material";
-import { FormEvent, useEffect, useState } from "react";
-import { createNewUser, loginWithGoogle } from "@/utils/firebase-account";
+import { AlertColor, Checkbox, FormControlLabel, Link } from "@mui/material";
+import { useFormState, useFormStatus } from "react-dom";
 
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import CustomAlert from "@/app/components/alert";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import PasswordInput from "@/app/components/password-input-controlled";
-import TextField from "@mui/material/TextField";
+import PasswordInput from "@/app/components/password-input";
+import React from "react";
+import TextFieldInput from "@/app/components/textfield-input";
 import Typography from "@mui/material/Typography";
+import { loginWithGoogle } from "@/utils/firebase-account";
+import registerFunction from "./register-function";
 import { useRouter } from "next/navigation";
 
-const defaultNoError = {
-  value: false,
+const initialState = {
   message: "",
+  status: "success" as AlertColor,
+  errors: {
+    email: { success: true, error: "" },
+    passwordOne: { success: true, error: "" },
+    passwordTwo: { success: true, error: "" },
+  },
 };
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
 export default function RegisterPage() {
-  const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState(defaultNoError);
-  const [email, setEmail] = useState("");
-  const [passwordOne, setPasswordOne] = useState("");
-  const [passwordTwo, setPasswordTwo] = useState("");
-  const [emailAlerts, setEmailAlerts] = useState(false);
+  const { pending } = useFormStatus();
+  const [open, setOpen] = React.useState(false);
+  const [state, formAction] = useFormState(registerFunction, initialState);
+
   const router = useRouter();
 
-  const registerAndRedirect = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      const result = await createNewUser(email, password, emailAlerts);
-
-      if (result && result != "User created successfully") {
-        setFormError({
-          value: true,
-          message: result,
-        });
-      } else if (formError.value === false) {
-        router.push("/");
-      }
-    } catch (error) {
-    } finally {
-      setLoading(false);
+  React.useEffect(() => {
+    if (state.message == "Success!") {
+      router.push("/");
     }
-  };
-
-  useEffect(() => {
-    validateForm();
-  }, [email, passwordOne, passwordTwo]);
-
-  const validateForm = () => {
-    setFormError(defaultNoError);
-
-    if (!passwordOne) {
-      setFormError({
-        value: true,
-        message: "Password is required",
-      });
-    } else if (passwordOne.length < 6) {
-      setFormError({
-        value: true,
-        message: "Password must be at least 6 characters.",
-      });
-    } else {
-      setFormError(defaultNoError);
-    }
-
-    if (!email) {
-      setFormError({
-        value: true,
-        message: "Email is required",
-      });
-    } else if (!EMAIL_REGEX.test(email)) {
-      setFormError({
-        value: true,
-        message: "Email format is invalid",
-      });
-    } else {
-      setFormError(defaultNoError);
-    }
-
-    if (passwordOne !== passwordTwo) {
-      setFormError({
-        value: true,
-        message: "Passwords do not match",
-      });
-    }
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setFormError(defaultNoError);
-
-    if (formError.value) {
-      return;
-    } else {
-      registerAndRedirect(email, passwordOne);
-    }
-  };
+  }, [state.message]);
 
   return (
     <Container maxWidth="xs">
@@ -119,59 +56,72 @@ export default function RegisterPage() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Box component="form" noValidate action={formAction} sx={{ mt: 3 }}>
           <Grid container spacing={2} marginBlock={2}>
             <Grid item xs={12}>
-              <TextField
+              <TextFieldInput
+                label="Email"
+                value=""
+                autoFocus={true}
+                error={!state.errors?.email.success && true}
+                helperText={
+                  state.errors?.email.success == false
+                    ? state.errors.email.error
+                    : ""
+                }
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <PasswordInput
+                name="passwordOne"
                 required
-                fullWidth
-                label="Email Address"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                name="email"
-                id="signUpEmail"
+                label="Password"
+                value=""
+                error={!state.errors?.passwordOne.success && true}
+                helperText={
+                  state.errors?.passwordOne.success == false
+                    ? state.errors.passwordOne.error
+                    : ""
+                }
               />
             </Grid>
             <Grid item xs={12}>
               <PasswordInput
+                name="passwordTwo"
+                required
                 label="Password"
-                value={passwordOne}
-                onChange={(value) => setPasswordOne(value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <PasswordInput
-                label="Password"
-                value={passwordTwo}
-                onChange={(value) => setPasswordTwo(value)}
+                value=""
+                error={!state.errors?.passwordTwo.success && true}
+                helperText={
+                  state.errors?.passwordTwo.success == false
+                    ? state.errors.passwordTwo.error
+                    : ""
+                }
               />
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    value="emailAlerts"
                     color="primary"
-                    checked={emailAlerts}
-                    onChange={(e) => setEmailAlerts(e.target.checked)}
+                    name="emailAlerts"
+                    defaultChecked
+                    value="true"
                   />
                 }
                 label="Receive email alerts for games I favourite."
               />
             </Grid>
           </Grid>
-          {formError.value && (
-            <Alert severity="error">{formError.message}</Alert>
-          )}
+          <CustomAlert state={state} />
           <Button
-            disabled={formError.value && formError.value}
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            {loading ? "Signing Up..." : "Sign Up"}
+            {pending ? "Signing Up..." : "Sign Up"}
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>

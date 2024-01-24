@@ -11,6 +11,7 @@ interface PasswordInputProps {
   required?: boolean;
   error?: boolean;
   helperText?: string;
+  name?: string;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -19,6 +20,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   required = true,
   error = false,
   helperText = "",
+  name = "",
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -32,7 +34,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   return (
     <TextField
       InputLabelProps={{ shrink: true }}
-      name={label.toLowerCase()}
+      name={name == "" ? label.toLowerCase() : name}
       margin="normal"
       error={error}
       helperText={error ? helperText : ""}

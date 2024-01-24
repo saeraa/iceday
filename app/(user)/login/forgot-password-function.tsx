@@ -1,5 +1,3 @@
-"use server";
-
 import { AlertColor } from "@mui/material";
 import { resetPassword } from "@/utils/firebase-account";
 
