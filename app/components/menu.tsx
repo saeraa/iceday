@@ -42,7 +42,7 @@ export default function AppMenu() {
     if (user?.email !== undefined && user?.email != null) {
       setUserEmail(user.email);
     }
-  }, [user?.email, user]);
+  }, [authContext]);
 
   const logoutAndRedirect = () => {
     logoutUser();
@@ -176,7 +176,7 @@ export default function AppMenu() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              {userEmail ? (
+              {authContext.user?.email ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Typography
                     variant="caption"

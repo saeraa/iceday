@@ -51,7 +51,7 @@ export default function AdminPage() {
     );
   } else {
     return (
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2 }} maxWidth={800}>
         <Typography variant="h4" sx={{ px: 2, my: 4 }}>
           Admin panel
         </Typography>
