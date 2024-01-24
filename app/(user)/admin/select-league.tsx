@@ -28,9 +28,8 @@ export default function SelectLeague() {
           onChange={handleChange}
           value={league}
         >
-          <MenuItem value={"League 1"}>League 1</MenuItem>
-          <MenuItem value={"League 2"}>League 2</MenuItem>
-          <MenuItem value={"League 3"}>League 3</MenuItem>
+          <MenuItem value={"SHL"}>Svenska Hockeyligan</MenuItem>
+          <MenuItem value={"HA"}>Hockeyallsvenskan</MenuItem>
         </Select>
       </FormControl>
     </>

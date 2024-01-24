@@ -4,7 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { AlertColor } from "@mui/material";
 import SelectLeague from "./select-league";
 import TextFieldInput from "@/app/components/textfield-input";
-import upload from "./uploadFile";
+import upload from "./add-team-function";
 
 const initialState = {
   message: "",
