@@ -1,7 +1,7 @@
-import { Alert, Box, Button, TextField } from "@mui/material";
+import { AlertColor, Box, Button, TextField } from "@mui/material";
 import { useFormState, useFormStatus } from "react-dom";
 
-import { AlertColor } from "@mui/material";
+import CustomAlert from "@/app/components/alert";
 import SelectLeague from "./select-league";
 import TextFieldInput from "@/app/components/textfield-input";
 import upload from "./add-team-function";
@@ -10,10 +10,10 @@ const initialState = {
   message: "",
   status: "success" as AlertColor,
   errors: {
-    name: { success: "true", error: "" },
-    abbreviation: { success: "true", error: "" },
-    city: { success: "true", error: "" },
-    file: { success: "true", error: "" },
+    name: { success: true, error: "" },
+    abbreviation: { success: true, error: "" },
+    city: { success: true, error: "" },
+    file: { success: true, error: "" },
   },
 };
 
@@ -27,17 +27,17 @@ export default function AddTeamForm() {
         label="Name"
         value=""
         autoFocus={true}
-        error={state.errors?.name.success == "false" && true}
+        error={!state.errors?.name.success && true}
         helperText={
-          state.errors?.name.success == "false" ? state.errors.name.error : ""
+          state.errors?.name.success == false ? state.errors.name.error : ""
         }
       />
       <TextFieldInput
         label="Abbreviation"
         value=""
-        error={state.errors?.abbreviation.success == "false" && true}
+        error={!state.errors?.abbreviation.success && true}
         helperText={
-          state.errors?.abbreviation.success == "false"
+          state.errors?.abbreviation.success == false
             ? state.errors.abbreviation.error
             : ""
         }
@@ -45,9 +45,9 @@ export default function AddTeamForm() {
       <TextFieldInput
         label="City"
         value=""
-        error={state.errors?.city.success == "false" && true}
+        error={!state.errors?.city.success && true}
         helperText={
-          state.errors?.city.success == "false" ? state.errors.city.error : ""
+          state.errors?.city.success == false ? state.errors.city.error : ""
         }
       />
 
@@ -61,9 +61,9 @@ export default function AddTeamForm() {
         id="uploadFile"
         name="file"
         label="Team icon"
-        error={state.errors?.file.success == "false" && true}
+        error={!state.errors?.file.success && true}
         helperText={
-          state.errors?.file.success == "false" ? state.errors.file.error : ""
+          state.errors?.file.success == false ? state.errors.file.error : ""
         }
       />
       <Button
@@ -75,9 +75,7 @@ export default function AddTeamForm() {
       >
         Add team
       </Button>
-      {state.message && (
-        <Alert severity={state.status && state.status}>{state.message}</Alert>
-      )}
+      <CustomAlert state={state} />
     </Box>
   );
 }

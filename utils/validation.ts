@@ -1,6 +1,6 @@
 import { ZodSchema, z } from "zod";
 
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const PASSWORD_REGEX = new RegExp(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/);
 const MAX_FILE_SIZE = 500000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -59,10 +59,10 @@ const passwordForm = z
   );
 
 interface TeamErrorObject {
-  name: { success: string; error: string };
-  abbreviation: { success: string; error: string };
-  city: { success: string; error: string };
-  file: { success: string; error: string };
+  name: { success: boolean; error: string };
+  abbreviation: { success: boolean; error: string };
+  city: { success: boolean; error: string };
+  file: { success: boolean; error: string };
 }
 
 interface TeamObject {
@@ -83,8 +83,8 @@ function validateTeam(input: TeamObject): TeamErrorObject {
 }
 
 interface LoginErrorObject {
-  email: { success: string; error: string };
-  password: { success: string; error: string };
+  email: { success: boolean; error: string };
+  password: { success: boolean; error: string };
 }
 
 interface LoginObject {
@@ -100,9 +100,9 @@ function validateLogin(input: LoginObject): LoginErrorObject {
 }
 
 interface RegisterErrorObject {
-  email: { success: string; error: string };
-  passwordOne: { success: string; error: string };
-  passwordTwo: { success: string; error: string };
+  email: { success: boolean; error: string };
+  passwordOne: { success: boolean; error: string };
+  passwordTwo: { success: boolean; error: string };
 }
 
 interface RegisterObject {
@@ -130,11 +130,11 @@ function parseInput(input: any, schema: ZodSchema, secondInput?: string) {
     validationResult = schema.safeParse(input);
   }
   const result = {
-    success: "true",
+    success: true,
     error: "",
   };
   if (!validationResult.success) {
-    result.success = "false";
+    result.success = false;
     result.error = validationResult.error.errors[0].message;
   }
   return result;

@@ -12,10 +12,10 @@ interface FormDataToUpload {
 }
 
 interface ErrorObject {
-  name: { success: string; error: string };
-  abbreviation: { success: string; error: string };
-  city: { success: string; error: string };
-  file: { success: string; error: string };
+  name: { success: boolean; error: string };
+  abbreviation: { success: boolean; error: string };
+  city: { success: boolean; error: string };
+  file: { success: boolean; error: string };
 }
 
 export default async function upload(
@@ -63,7 +63,7 @@ export default async function upload(
   let error = false;
 
   keys.forEach((key) => {
-    if (validationResult[key].success == "false") {
+    if (validationResult[key].success == false) {
       error = true;
     }
   });
