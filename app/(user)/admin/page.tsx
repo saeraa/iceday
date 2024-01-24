@@ -2,6 +2,7 @@
 
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 
+import AddGameForm from "./add-game";
 import AddTeamForm from "./add-team";
 import { AuthContext } from "@/app/context/Auth.context";
 import React from "react";
@@ -70,7 +71,7 @@ export default function AdminPage() {
           <AddTeamForm />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          Add Game
+          <AddGameForm />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           Edit Team

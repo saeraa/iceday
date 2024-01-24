@@ -6,6 +6,11 @@ import SelectLeague from "./select-league";
 import TextFieldInput from "@/app/components/textfield-input";
 import upload from "./add-team-function";
 
+const LeagueArray = [
+  { name: "Svenska Ishockeyligan", value: "SHL" },
+  { name: "Hockeyallsvenskan", value: "HA" },
+];
+
 const initialState = {
   message: "",
   status: "success" as AlertColor,
@@ -51,7 +56,8 @@ export default function AddTeamForm() {
         }
       />
 
-      <SelectLeague />
+      <SelectLeague name="League" options={LeagueArray} />
+
       <TextField
         type="file"
         InputLabelProps={{ shrink: true }}

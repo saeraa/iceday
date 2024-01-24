@@ -58,6 +58,19 @@ const passwordForm = z
     }
   );
 
+const gameForm = z
+  .object({
+    homeTeam: z.string(),
+    awayTeam: z.string(),
+  })
+  .refine(
+    (data: { homeTeam: string; awayTeam: string }) =>
+      data.homeTeam !== data.awayTeam,
+    {
+      message: "You can't schedule a game with only one participating team.",
+    }
+  );
+
 interface TeamErrorObject {
   name: { success: boolean; error: string };
   abbreviation: { success: boolean; error: string };
@@ -119,6 +132,25 @@ function validateRegister(input: RegisterObject): RegisterErrorObject {
   };
 }
 
+interface AddGameObject {
+  homeTeam: string;
+  awayTeam: string;
+}
+
+function validateAddGameForm({ homeTeam, awayTeam }: AddGameObject) {
+  let validationResult = gameForm.safeParse({ homeTeam, awayTeam });
+
+  const result = {
+    success: true,
+    error: "",
+  };
+  if (!validationResult.success) {
+    result.success = false;
+    result.error = validationResult.error.errors[0].message;
+  }
+  return { homeTeam: result };
+}
+
 function parseInput(input: any, schema: ZodSchema, secondInput?: string) {
   let validationResult: z.SafeParseReturnType<any, any>;
   if (secondInput) {
@@ -140,4 +172,4 @@ function parseInput(input: any, schema: ZodSchema, secondInput?: string) {
   return result;
 }
 
-export { validateTeam, validateLogin, validateRegister };
+export { validateTeam, validateLogin, validateRegister, validateAddGameForm };

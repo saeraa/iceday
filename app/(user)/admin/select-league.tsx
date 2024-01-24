@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -8,29 +9,56 @@ import {
 
 import { useState } from "react";
 
-export default function SelectLeague() {
-  const [league, setLeague] = useState("League 1");
+interface SelectProps {
+  children?: React.ReactNode;
+  name: string;
+  options: Option[];
+  error?: boolean;
+  helperText?: string | undefined;
+}
+
+type Option = {
+  name: string;
+  value: string;
+};
+
+export default function SelectLeague({
+  name,
+  options,
+  error,
+  helperText,
+}: SelectProps) {
+  const [value, setValue] = useState("");
+
+  const nameWithoutWhiteSpaces = name.replace(/\s+/g, "").toLowerCase();
 
   const handleChange = (event: SelectChangeEvent) => {
-    setLeague(event.target.value);
+    setValue(event.target.value);
   };
 
   return (
     <>
       <FormControl sx={{ my: 2, minWidth: "100%" }}>
-        <InputLabel id="league-label">League</InputLabel>
+        <InputLabel id={`${nameWithoutWhiteSpaces}-label`}>{name}</InputLabel>
         <Select
-          name="league"
+          error={error && error == true ? true : false}
+          name={nameWithoutWhiteSpaces}
           fullWidth
-          labelId="league-label"
-          id="league"
-          label="League"
+          labelId={`${nameWithoutWhiteSpaces}-label`}
+          id={nameWithoutWhiteSpaces}
+          label={nameWithoutWhiteSpaces}
           onChange={handleChange}
-          value={league}
+          value={value}
         >
-          <MenuItem value={"SHL"}>Svenska Hockeyligan</MenuItem>
-          <MenuItem value={"HA"}>Hockeyallsvenskan</MenuItem>
+          {options.map((item) => (
+            <MenuItem key={item.value + item.name} value={item.value}>
+              {item.name}
+            </MenuItem>
+          ))}
         </Select>
+        {error && error == true && (
+          <FormHelperText>{helperText}</FormHelperText>
+        )}
       </FormControl>
     </>
   );
