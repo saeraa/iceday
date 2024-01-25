@@ -72,7 +72,7 @@ export default function AddGameForm() {
         sx={{ mt: 3, mb: 2 }}
         aria-disabled={pending}
       >
-        Add team
+        Add game
       </Button>
       <CustomAlert state={state} />
     </Box>
