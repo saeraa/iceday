@@ -17,9 +17,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
 dayjs.extend(customParseFormat);
-
 dayjs.extend(timezone);
-
 dayjs.extend(utc);
 
 export const poppins = Poppins({
@@ -54,11 +52,7 @@ const theme = createTheme({
   },
 });
 
-export default function ThemeClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Wrapper({ children }: { children: React.ReactNode }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <AuthProvider>

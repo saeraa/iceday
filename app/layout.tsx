@@ -1,9 +1,8 @@
 import "./globals.css";
 
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
-import { Box } from "@mui/material";
 import type { Metadata } from "next";
-import ThemeClient from "./themeclient";
+import Wrapper from "./wrapper";
 
 export const metadata: Metadata = {
   title: "Iceday",
@@ -19,9 +18,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppRouterCacheProvider>
-          <ThemeClient>
+          <Wrapper>
             <main>{children}</main>
-          </ThemeClient>
+          </Wrapper>
         </AppRouterCacheProvider>
       </body>
     </html>
