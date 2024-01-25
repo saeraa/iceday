@@ -74,7 +74,7 @@ export default function AdminPage() {
           <AddGameForm />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          Edit Team
+          To be implemented
         </CustomTabPanel>
       </Box>
     );

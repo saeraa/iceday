@@ -1,5 +1,5 @@
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import db, { storage } from "@/utils/firebase";
-import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 
 import { Dayjs } from "dayjs";
@@ -19,7 +19,14 @@ interface GameData {
 }
 
 const addGame = async (gameData: GameData) => {
-  return "OK";
+  const result = await addDoc(collection(db, "games"), {
+    homeTeam: gameData.homeTeam,
+    awayTeam: gameData.awayTeam,
+    dateTime: gameData.dateTime.toDate(),
+    league: gameData.league,
+  });
+
+  return result;
 };
 
 const uploadTeamIcon = async (file: File, abbreviation: string) => {

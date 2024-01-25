@@ -58,7 +58,11 @@ export default function AddGameForm() {
 
       <SelectLeague name="League" options={LeagueArray} />
 
-      <DatePicker name="date" sx={{ mr: 2 }} timezone="Europe/Paris" />
+      <DatePicker
+        name="date"
+        sx={{ mr: { sm: 2 }, mb: { xs: 2, md: 0 } }}
+        timezone="Europe/Paris"
+      />
       <TimePicker name="time" />
 
       <Button

@@ -29,7 +29,6 @@ export default async function upload(
     };
   }
 
-  console.log(formData);
   const date = formData.get("date")?.toString();
   const league = formData.get("league")?.toString();
   const time = formData.get("time")?.toString();
@@ -77,5 +76,9 @@ export default async function upload(
     }
   }
 
-  return { message: "", status: "success", errors: null };
+  return {
+    message: "All fields need to be filled in",
+    status: "error",
+    errors: null,
+  };
 }
