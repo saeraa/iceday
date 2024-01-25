@@ -1,5 +1,7 @@
 "use client";
 
+import "dayjs/locale/en-gb";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -9,6 +11,14 @@ import Footer from "./components/footer";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import Menu from "./components/menu";
 import { Poppins } from "next/font/google";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(timezone);
+dayjs.extend(utc);
 
 export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
@@ -42,13 +52,9 @@ const theme = createTheme({
   },
 });
 
-export default function ThemeClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Wrapper({ children }: { children: React.ReactNode }) {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <AuthProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />

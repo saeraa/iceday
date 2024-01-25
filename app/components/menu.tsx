@@ -19,7 +19,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { logoutUser } from "@/utils/firebase-functions";
+import { logoutUser } from "@/utils/firebase-account";
 import { useRouter } from "next/navigation";
 
 const pages = ["Calendar", "Teams", "Leagues"];
@@ -42,7 +42,7 @@ export default function AppMenu() {
     if (user?.email !== undefined && user?.email != null) {
       setUserEmail(user.email);
     }
-  }, [user?.email, user]);
+  }, [authContext]);
 
   const logoutAndRedirect = () => {
     logoutUser();
@@ -176,7 +176,7 @@ export default function AppMenu() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              {userEmail ? (
+              {authContext.user?.email ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Typography
                     variant="caption"

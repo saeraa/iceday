@@ -22,11 +22,13 @@ import {
   changeUserEmail,
   deleteAccount,
   updateAlertPreferences,
-} from "@/utils/firebase-functions";
+} from "@/utils/firebase-account";
 
 import { AuthContext } from "@/app/context/Auth.context";
+import { useRouter } from "next/navigation";
 
 export default function AccountPage() {
+  const router = useRouter();
   const [wrongPassword, setWrongPassword] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -187,7 +189,11 @@ export default function AccountPage() {
               Delete account
             </Button>
             {admin && (
-              <Button type="button" variant="contained">
+              <Button
+                type="button"
+                variant="contained"
+                onClick={() => router.push("/admin")}
+              >
                 Admin panel
               </Button>
             )}

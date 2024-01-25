@@ -8,19 +8,19 @@ import TextField from "@mui/material/TextField";
 interface PasswordInputProps {
   label: string;
   value: string;
+  onChange: (value: string) => void;
   required?: boolean;
   error?: boolean;
   helperText?: string;
-  name?: string;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
   label,
   value,
+  onChange,
   required = true,
   error = false,
   helperText = "",
-  name = "",
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -33,16 +33,15 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <TextField
-      InputLabelProps={{ shrink: true }}
-      name={name == "" ? label.toLowerCase() : name}
       margin="normal"
       error={error}
       helperText={error ? helperText : ""}
       required={required}
       fullWidth
-      defaultValue={value}
       label={label}
       autoComplete="password"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
       type={showPassword ? "text" : "password"}
       InputProps={{
         endAdornment: (

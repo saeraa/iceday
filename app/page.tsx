@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 
 export default function Home() {
   return (
-    <Box component="main">
+    <Box>
       <Grid container spacing={2} sx={{ py: 3 }}>
         <Grid xs={12} md={6}>
           <Calendar />

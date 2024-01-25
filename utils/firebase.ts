@@ -1,8 +1,8 @@
+import { EmailAuthProvider, GoogleAuthProvider, getAuth } from "firebase/auth";
 import { getApps, initializeApp } from "firebase/app";
 
-import { EmailAuthProvider } from "firebase/auth";
-import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,9 +16,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const provider = new EmailAuthProvider();
-const db = getFirestore(app);
 const auth = getAuth(app);
 
-export { provider, auth, app };
+const provider = new EmailAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+const db = getFirestore(app);
+const storage = getStorage();
+
+export { auth, app, storage, googleProvider, provider };
 export default db;

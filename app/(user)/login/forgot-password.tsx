@@ -2,7 +2,9 @@
 
 import * as React from "react";
 
-import { Alert } from "@mui/material";
+import { Alert, AlertColor } from "@mui/material";
+import { useFormState, useFormStatus } from "react-dom";
+
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -10,13 +12,22 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import { resetPassword } from "@/utils/firebase-functions";
-import { useState } from "react";
+import forgotPasswordFunction from "./forgot-password-function";
 
-const defaultNoError = {
-  value: false,
+const initialState = {
   message: "",
+  status: "success" as AlertColor,
+  errors: "",
 };
+
+function Submit() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" aria-disabled={pending}>
+      Submit
+    </Button>
+  );
+}
 
 export default function FormDialog({
   open,
@@ -25,7 +36,12 @@ export default function FormDialog({
   open: boolean;
   handleClose: () => void;
 }) {
-  const [formError, setFormError] = useState(defaultNoError);
+  const { pending } = useFormStatus();
+  const [state, formAction] = useFormState(
+    forgotPasswordFunction,
+    initialState
+  );
+
   return (
     <React.Fragment>
       <Dialog
@@ -34,20 +50,10 @@ export default function FormDialog({
         PaperProps={{
           component: "form",
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
             const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries((formData as any).entries());
-            const email = formJson.email;
-
-            const result = await resetPassword(email);
-            if (result == "Password reset email sent successfully") {
-              handleClose();
-            } else {
-              setFormError({
-                value: true,
-                message: result,
-              });
-            }
+            const thing = await formAction(formData);
+            console.log(thing);
+            if (state.message == "success") handleClose();
           },
         }}
       >
@@ -58,7 +64,6 @@ export default function FormDialog({
           </DialogContentText>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="name"
             name="email"
@@ -67,13 +72,15 @@ export default function FormDialog({
             fullWidth
             variant="standard"
           />
-          {formError.value && (
-            <Alert severity="error">{formError.message}</Alert>
+          {state.message && (
+            <Alert severity={state.status && state.status}>
+              {state.errors}
+            </Alert>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Submit</Button>
+          <Submit />
         </DialogActions>
       </Dialog>
     </React.Fragment>
