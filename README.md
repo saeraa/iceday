@@ -1,4 +1,5 @@
 # iceday
+
 examination project 2024 - hockey calendar app
 
 ---
@@ -7,35 +8,13 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+Before beginning, you need to set up a Firebase project. Go to the console > Add Project. Enter a name, and opt out of Google Analytics. Wait for the project to be set up. Choose to register an app to use with the project by clicking on the web icon. Enter a name. Under the next heading, Add Firebase SDK, you will receive the information you need to populate the .env.local to get the environment variables required. See `sample.env.local`.
+Once your app is created, you set up the Authentication. Providers used are email/password and Google. Next, you set up Firestore Database and Storage.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+To install the dependencies, `npm install`, followed by starting up the development server with `npm run dev`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser. If you've set up Firebase properly, you should be able to register a new account and login. To explore the admin options, you will have to go into your Firebase console -> Firebase Database, find the users collection, and for your chosen user, change `roles: "user"` to `roles: "admin"`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+See the system design [in the project folder](_project/README.md).
