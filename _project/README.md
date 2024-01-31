@@ -15,7 +15,8 @@ Highlight days with scheduled games.
 
 Upon selecting a day, present a list of games scheduled for that day.
 Include details like teams playing, time, and venue.
-Favorites Feature:
+
+#### Favorites Feature:
 Allow users to mark specific games or teams as favourites for easy access.
 
 #### Email Alerts:
